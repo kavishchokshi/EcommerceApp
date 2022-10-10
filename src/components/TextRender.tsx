@@ -3,7 +3,7 @@ import React from 'react';
 
 const TextRender = ({label, value}: any) => {
   return (
-    <View style={styles.mainContainer}>
+    <View style={styles.mainContainer} testID='render-text'>
       <Text style={styles.labelText}>{label}: </Text>
       <Text style={styles.valueText}>{value}</Text>
     </View>
