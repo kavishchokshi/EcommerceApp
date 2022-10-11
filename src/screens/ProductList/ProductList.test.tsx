@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, render, screen } from "@testing-library/react-native";
+import { cleanup, render } from "@testing-library/react-native";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import ProductList from "./ProductList";
@@ -12,6 +12,7 @@ import { reducer } from "../../redux/reducer";
 import { act } from "react-test-renderer";
 import TextRender from "../../components/TextRender";
 import RenderProductItem from "../../components/RenderProductItem";
+import { addItemToCart, removeItemFromCart } from "../../redux/actions";
 
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
 jest.mock("@react-navigation/native", () => {
@@ -42,6 +43,7 @@ let store: any = mockStore(initialState);
 describe("With React Testing Library", () => {
   beforeAll(() => {
     store = createTestStore();
+    jest.setTimeout(30000);
   });
 
   it("Open Product List", () => {
@@ -79,6 +81,11 @@ describe("With React Testing Library", () => {
         <RenderProductItem item={response[0]} />
       </Provider>
     );
+
+    act(() => {
+      expect(store.dispatch(addItemToCart(response[0])));
+      expect(store.dispatch(removeItemFromCart(response[0])));
+    });
 
     act(() => {
       expect(getAllByTestId("render-text"));

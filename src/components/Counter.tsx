@@ -9,7 +9,7 @@ const Counter = ({ item }: any) => {
   return (
     <View style={styles.mainContainer} testID="counter-view">
       <TouchableOpacity
-        testID="add-item"
+        testID="minus-item"
         activeOpacity={item?.count > 0 ? 0.2 : 1}
         onPress={() =>
           item.count > 0 ? dispatch(removeItemFromCart(item)) : {}
@@ -22,7 +22,7 @@ const Counter = ({ item }: any) => {
       <Text style={{ marginHorizontal: 5 }}>{item?.count}</Text>
 
       <TouchableOpacity
-        testID="minus-item"
+        testID="add-item"
         onPress={() => dispatch(addItemToCart(item))}
         style={styles.counterContainer}
       >
