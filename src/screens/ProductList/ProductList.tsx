@@ -1,22 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
-import {View, Image, FlatList, Text} from 'react-native';
+import {View, FlatList} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import {useSelector} from 'react-redux';
 
 import Header from '../../components/Header';
 import {screenNames} from '../../constants/navigationConstants';
-import {StyleSheet} from 'react-native';
-import TextRender from '../../components/TextRender';
-import Counter from '../../components/Counter';
+import { fetchProductList } from './api';
+import RenderProductItem from '../../components/RenderProductItem';
 
-interface ProductListResponse {
+export interface ProductListResponse {
   colour: string;
   id: number;
   img: string;
   name: string;
   price: number;
-  count?: number;
+  count?: number | undefined;
 }
 
 const ProductList = ({navigation}: any) => {
@@ -24,24 +22,21 @@ const ProductList = ({navigation}: any) => {
   const [initalData, setInitialData] = useState<ProductListResponse[]>([]);
   const {cartList} = useSelector((state: any) => state);
 
-  const fetchProductList = async () => {
-    try {
-      const {data, status} = await axios.get(
-        'https://my-json-server.typicode.com/benirvingplt/products/products',
-      );
-      if (status === 200) {
-        setList(data);
-        setInitialData(data);
-      } else {
-        throw new Error('something went wrong');
+  
+  const fetchList = async() => {
+     try {
+      const response = await fetchProductList();
+      if(response){
+        setInitialData(response);
+        setList(response)
       }
-    } catch (error) {
-      throw new Error('error');
-    }
-  };
+     } catch (error) {
+      throw new Error('Something went wrong');
+     }
+  }
 
   useEffect(() => {
-    fetchProductList();
+   fetchList();
   }, []);
 
   useEffect(() => {
@@ -59,32 +54,10 @@ const ProductList = ({navigation}: any) => {
     setList(temp);
   }, [cartList, initalData]);
 
-  const renderItem = (item: ProductListResponse) => {
-    return (
-      <View style={styles.itemContainer}>
-        <Image
-          style={styles.imgContainer}
-          source={{
-            uri: item.id === 1 ? item.img.replace('http', 'https') : item.img,
-          }}
-          resizeMode="stretch"
-        />
-        <View style={styles.subViewContainer}>
-          <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
-          <View style={styles.descriptionContainer}>
-            <View style={{marginTop: 10}}>
-              <TextRender label="Color" value={item.colour} />
-              <TextRender label="Price" value={`$${item.price}`} />
-            </View>
-            <Counter item={item} />
-          </View>
-        </View>
-      </View>
-    );
-  };
+  
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1}} testID='product-view'>
       <Header
         title="Product List"
         isCart
@@ -98,8 +71,9 @@ const ProductList = ({navigation}: any) => {
         contentContainerStyle={{paddingTop: 5}}
         data={list}
         numColumns={2}
+        testID='list'
         keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => renderItem(item)}
+        renderItem={({item}) => <RenderProductItem item={item}/>}
       />
     </View>
   );
@@ -107,40 +81,4 @@ const ProductList = ({navigation}: any) => {
 
 export default ProductList;
 
-const styles = StyleSheet.create({
-  itemContainer: {
-    marginHorizontal: 8,
-    marginBottom: 15,
-    borderWidth: 0.5,
-    borderRadius: 5,
-    flex: 1,
-    borderColor: 'lightgrey',
-    shadowColor: 'rgb(0, 0, 0)',
-    shadowOffset: {
-      width: 1,
-      height: 1,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 2,
-    backgroundColor: 'white',
-    paddingBottom: 5,
-  },
-  imgContainer: {
-    height: 250,
-    width: '100%',
-    overflow: 'hidden',
-    borderRadius: 5,
-  },
-  subViewContainer: {
-    justifyContent: 'space-between',
-    flex: 1,
-    paddingHorizontal: 5,
-  },
-  descriptionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginEnd: 5,
-  },
-});
+
