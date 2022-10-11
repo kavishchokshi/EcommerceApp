@@ -40,13 +40,13 @@ const initialState = { cartList: [], total: 0 };
 const mockStore = configureStore();
 let store: any = mockStore(initialState);
 
-describe("With React Testing Library", () => {
+describe("Testing the product list screen", () => {
   beforeAll(() => {
     store = createTestStore();
     jest.setTimeout(30000);
   });
 
-  it("Open Product List", () => {
+  it("Open Product List screen and check header", () => {
     const { getByTestId } = render(
       <Provider store={store}>
         <ProductList />
@@ -57,7 +57,7 @@ describe("With React Testing Library", () => {
     expect(<Header title="Product List" />);
   });
 
-  it("find counter", () => {
+  it("find counter and test counter functionality", () => {
     const { getByTestId } = render(
       <Provider store={store}>
         <Counter />
@@ -71,9 +71,9 @@ describe("With React Testing Library", () => {
     expect(getByTestId("counter-view"));
   });
 
-  test("Product API Call", async (done) => {
+  test("Product API Call and checking the data", async (done) => {
     const response = await fetchProductList();
-    const { getByTestId, getAllByTestId } = render(
+    const { getByTestId, getAllByTestId, queryByText } = render(
       <Provider store={store}>
         <ProductList />
         <Counter />
@@ -85,6 +85,12 @@ describe("With React Testing Library", () => {
     act(() => {
       expect(store.dispatch(addItemToCart(response[0])));
       expect(store.dispatch(removeItemFromCart(response[0])));
+      response.map(({ img, colour, name, price }: any) => {
+        expect(colour).not.toBeNull();
+        expect(img).not.toBeNull();
+        expect(name).not.toBeNull();
+        expect(price).not.toBeNull();
+      });
     });
 
     act(() => {
